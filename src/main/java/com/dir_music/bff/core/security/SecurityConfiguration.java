@@ -1,6 +1,6 @@
 package com.dir_music.bff.core.security;
 
-import com.dir_music.bff.feign_controller.auth_controller.AuthenticationController;
+import com.dir_music.bff.feign_controller.auth_controller.AuthenticationControllerFeign;
 import com.dir_music.bff.feign_controller.auth_controller.input.TokenValidationControllerInput;
 import com.dir_music.bff.feign_controller.auth_controller.output.TokenValidationControllerOutput;
 import jakarta.servlet.FilterChain;
@@ -8,7 +8,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,10 +26,10 @@ import java.io.IOException;
 @Configuration
 public class SecurityConfiguration {
 
-    final AuthenticationController authenticationController;
+    final AuthenticationControllerFeign authenticationController;
 
     @Autowired
-    public SecurityConfiguration(AuthenticationController authenticationController) {
+    public SecurityConfiguration(AuthenticationControllerFeign authenticationController) {
         this.authenticationController = authenticationController;
     }
 
@@ -43,9 +42,11 @@ public class SecurityConfiguration {
         http.authorizeHttpRequests()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/login").permitAll()
-                .requestMatchers("/register").permitAll()
+                .requestMatchers("/users/register").permitAll()
                 .requestMatchers("/search").authenticated()
-                .requestMatchers("/music/create").hasRole("ADMIN")
+                .requestMatchers("/songs/create").hasRole("ADMIN")
+                .requestMatchers("/songs/delete").hasRole("ADMIN")
+                .requestMatchers("/songs/isAvailable").permitAll()
                 .anyRequest().authenticated();
         return http.build();
     }
@@ -55,8 +56,13 @@ public class SecurityConfiguration {
         final String accessToken = ((HttpServletRequest) request).getHeader("Authorization");
 
         if (accessToken == null || accessToken.isEmpty()) {
-            response.getWriter().write("No token provided");
-            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "No token provided");
+            Authentication auth = new CustomAuthentication(
+                    null,
+                    null,
+                    false
+            );
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            chain.doFilter(request, response);
             return;
         }
 
@@ -69,7 +75,13 @@ public class SecurityConfiguration {
             tokenValidationControllerOutputResponseEntity =
                     this.authenticationController.getClaims(tokenValidationControllerInput);
         } catch (Exception e) {
-            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+            Authentication auth = new CustomAuthentication(
+                    null,
+                    null,
+                    false
+            );
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            chain.doFilter(request, response);
             return;
         }
 
@@ -77,15 +89,30 @@ public class SecurityConfiguration {
                 tokenValidationControllerOutputResponseEntity.getBody() != null) {
             Authentication auth = new CustomAuthentication(
                     Long.parseLong(tokenValidationControllerOutputResponseEntity.getBody().getUsername()),
-                    tokenValidationControllerOutputResponseEntity.getBody().getRole()
+                    tokenValidationControllerOutputResponseEntity.getBody().getRole(),
+                    true
             );
             SecurityContextHolder.getContext().setAuthentication(auth);
 
             chain.doFilter(request, response);
         } else if (tokenValidationControllerOutputResponseEntity.getStatusCode() == HttpStatus.FORBIDDEN) {
-            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN, "Token expired");
+            Authentication auth = new CustomAuthentication(
+                    null,
+                    null,
+                    false
+            );
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            chain.doFilter(request, response);
+            return;
         } else {
-            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+            Authentication auth = new CustomAuthentication(
+                    null,
+                    null,
+                    false
+            );
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            chain.doFilter(request, response);
+            return;
         }
 
     }
