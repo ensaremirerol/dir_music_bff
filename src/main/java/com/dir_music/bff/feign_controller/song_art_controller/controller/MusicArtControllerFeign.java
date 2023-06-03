@@ -10,17 +10,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @FeignClient(name = "cover-art-microservice")
-public interface MusicArtController {
+public interface MusicArtControllerFeign {
 
 
-    @GetMapping("/gimme/{id}")
+    @GetMapping("musicArt/gimme/{id}")
     ResponseEntity<Resource> streamMusicArt(@PathVariable Long id);
 
-    @PostMapping("/upload/{id}")
-    ResponseEntity<String> uploadMusicArt(@PathVariable Long id, @RequestParam("file")MultipartFile file) throws IOException;
+    @PostMapping(value="musicArt/upload/{id}", consumes = "multipart/form-data", produces = "application/json")
+    ResponseEntity<String> uploadMusicArt(@PathVariable("id") Long id, @RequestPart("file")MultipartFile file);
 
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("musicArt/delete/{id}")
     ResponseEntity<String> deleteMusicArt(@PathVariable Long id);
 
 

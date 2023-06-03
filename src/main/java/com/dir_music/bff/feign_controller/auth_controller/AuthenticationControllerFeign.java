@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 @FeignClient(name = "dir-authentication-service")
-public interface AuthenticationController {
+public interface AuthenticationControllerFeign {
 
     @PostMapping(path = "/register", consumes = "application/json", produces = "application/json")
     ResponseEntity<RegisterOutput> register(

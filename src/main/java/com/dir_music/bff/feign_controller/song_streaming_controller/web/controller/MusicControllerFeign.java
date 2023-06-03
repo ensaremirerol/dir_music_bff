@@ -10,24 +10,24 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-@FeignClient(name = "song-streaming-microservice")
-public interface MusicController {
+@FeignClient(name = "dir-stream-song-service")
+public interface MusicControllerFeign {
 
-    @GetMapping("/{id}/stream")
+    @GetMapping("/songs/{id}/stream")
     ResponseEntity<Resource> streamMusic(@PathVariable Long id,
                                          @RequestHeader HttpHeaders headers);
 
 
-    @PostMapping("isAvailable")
+    @PostMapping("/songs/isAvailable")
     ResponseEntity<MusicAvailableResponseModel> checkMusicAvailability(@RequestBody List<Long> musicIds);
 
-    @PostMapping("/create/{artist}/{album}/{id}")
-    ResponseEntity<String> uploadMusicFile(@RequestParam("file") MultipartFile file,
+    @PostMapping(value ="/songs/create/{artist}/{album}/{id}", consumes = "multipart/form-data", produces = "application/json")
+    ResponseEntity<String> uploadMusicFile(@RequestPart("file") MultipartFile file,
                                            @PathVariable Long id,
                                            @PathVariable String artist,
                                            @PathVariable String album) throws IOException;
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/songs/delete/{id}")
     ResponseEntity<String> deleteMusic(@PathVariable Long id) throws IOException;
 
 }

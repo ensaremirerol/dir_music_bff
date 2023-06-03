@@ -13,21 +13,21 @@ public interface UserControllerFeign {
 
 
 
-    @GetMapping(path = "/{userId}")
-    public ResponseEntity<UserControllerUserProfileOutput> getUserById(
+    @GetMapping(path = "users/{userId}")
+    ResponseEntity<UserControllerUserProfileOutput> getUserById(
             @PathVariable("userId") Long userId,
             @RequestParam(value = "isDetailed", defaultValue = "false") boolean isDetailed
     );
 
-    @PostMapping("/register")
+    @PostMapping("users/register")
     ResponseEntity<UserControllerUserProfileOutput> createUser(@RequestBody UserControllerRegisterInput userModel);
 
-    @PutMapping(path = "/{userId}")
+    @PutMapping(path = "users/{userId}")
     ResponseEntity<UserControllerUserProfileOutput> updateUser
             (@RequestBody UserControllerUpdateInput userControllerUpdateInput,
              @PathVariable("userId") Long userId);
 
-    @DeleteMapping(path = "/{userId}")
+    @DeleteMapping(path = "users/{userId}")
     ResponseEntity<Object> deleteUser(
             @PathVariable("userId") Long userId);
 
