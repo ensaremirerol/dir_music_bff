@@ -43,9 +43,10 @@ public class SecurityConfiguration {
         http.authorizeHttpRequests()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/login").permitAll()
-                .requestMatchers("/register").permitAll()
+                .requestMatchers("/user/register").permitAll()
                 .requestMatchers("/search").authenticated()
-                .requestMatchers("/music/create").hasRole("ADMIN")
+                .requestMatchers("/songs/create").hasRole("ADMIN")
+                .requestMatchers("/songs/delete").hasRole("ADMIN")
                 .anyRequest().authenticated();
         return http.build();
     }
@@ -69,7 +70,13 @@ public class SecurityConfiguration {
             tokenValidationControllerOutputResponseEntity =
                     this.authenticationController.getClaims(tokenValidationControllerInput);
         } catch (Exception e) {
-            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+            Authentication auth = new CustomAuthentication(
+                    null,
+                    null,
+                    false
+            );
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            chain.doFilter(request, response);
             return;
         }
 
@@ -77,15 +84,30 @@ public class SecurityConfiguration {
                 tokenValidationControllerOutputResponseEntity.getBody() != null) {
             Authentication auth = new CustomAuthentication(
                     Long.parseLong(tokenValidationControllerOutputResponseEntity.getBody().getUsername()),
-                    tokenValidationControllerOutputResponseEntity.getBody().getRole()
+                    tokenValidationControllerOutputResponseEntity.getBody().getRole(),
+                    true
             );
             SecurityContextHolder.getContext().setAuthentication(auth);
 
             chain.doFilter(request, response);
         } else if (tokenValidationControllerOutputResponseEntity.getStatusCode() == HttpStatus.FORBIDDEN) {
-            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN, "Token expired");
+            Authentication auth = new CustomAuthentication(
+                    null,
+                    null,
+                    false
+            );
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            chain.doFilter(request, response);
+            return;
         } else {
-            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+            Authentication auth = new CustomAuthentication(
+                    null,
+                    null,
+                    false
+            );
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            chain.doFilter(request, response);
+            return;
         }
 
     }

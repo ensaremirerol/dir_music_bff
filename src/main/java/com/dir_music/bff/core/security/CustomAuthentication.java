@@ -12,10 +12,10 @@ public class CustomAuthentication implements Authentication {
     private final String role;
     private boolean authenticated;
 
-    public CustomAuthentication(Long id, String role) {
+    public CustomAuthentication(Long id, String role, boolean authenticated) {
         this.id = id;
         this.role = role;
-        this.authenticated = true;
+        this.authenticated = authenticated;
     }
 
     @Override
