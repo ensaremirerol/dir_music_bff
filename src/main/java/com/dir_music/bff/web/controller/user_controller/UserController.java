@@ -31,6 +31,12 @@ public class UserController {
 
         return userControllerFeign.getUserById(id, isDetailed);
     }
+    @GetMapping("/me")
+    public ResponseEntity<UserControllerUserProfileOutput> getMe(){
+        long requesterId =
+                (long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userControllerFeign.getUserById(requesterId, true);
+    }
 
     @PostMapping("/register")
     public ResponseEntity<UserControllerUserProfileOutput> createUser(@RequestBody UserControllerRegisterInput userModel) {
