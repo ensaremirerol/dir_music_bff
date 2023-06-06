@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,13 +76,7 @@ public class SecurityConfiguration {
             tokenValidationControllerOutputResponseEntity =
                     this.authenticationController.getClaims(tokenValidationControllerInput);
         } catch (Exception e) {
-            Authentication auth = new CustomAuthentication(
-                    null,
-                    null,
-                    false
-            );
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            chain.doFilter(request, response);
+            ((HttpServletResponse) response).sendError(HttpStatus.BAD_REQUEST.value(), "Request Failed");
             return;
         }
 
@@ -96,23 +91,9 @@ public class SecurityConfiguration {
 
             chain.doFilter(request, response);
         } else if (tokenValidationControllerOutputResponseEntity.getStatusCode() == HttpStatus.FORBIDDEN) {
-            Authentication auth = new CustomAuthentication(
-                    null,
-                    null,
-                    false
-            );
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            chain.doFilter(request, response);
-            return;
-        } else {
-            Authentication auth = new CustomAuthentication(
-                    null,
-                    null,
-                    false
-            );
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            chain.doFilter(request, response);
-            return;
+            ((HttpServletResponse) response).sendError(HttpStatus.FORBIDDEN.value(), "Expired token");
+        } else if (tokenValidationControllerOutputResponseEntity.getStatusCode() == HttpStatus.BAD_REQUEST) {
+            ((HttpServletResponse) response).sendError(HttpStatus.BAD_REQUEST.value(), "Request Failed");
         }
 
     }
