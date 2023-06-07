@@ -3,6 +3,7 @@ package com.dir_music.bff.core.security;
 import com.dir_music.bff.feign_controller.auth_controller.AuthenticationControllerFeign;
 import com.dir_music.bff.feign_controller.auth_controller.input.TokenValidationControllerInput;
 import com.dir_music.bff.feign_controller.auth_controller.output.TokenValidationControllerOutput;
+import feign.FeignException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -43,6 +44,7 @@ public class SecurityConfiguration {
         http.authorizeHttpRequests()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/login").permitAll()
+                .requestMatchers("/refresh").permitAll()
                 .requestMatchers("/users/register").permitAll()
                 .requestMatchers("/search").authenticated()
                 .requestMatchers("/songs/create").hasRole("ADMIN")
@@ -75,8 +77,8 @@ public class SecurityConfiguration {
         try {
             tokenValidationControllerOutputResponseEntity =
                     this.authenticationController.getClaims(tokenValidationControllerInput);
-        } catch (Exception e) {
-            ((HttpServletResponse) response).sendError(HttpStatus.BAD_REQUEST.value(), "Request Failed");
+        } catch (FeignException e) {
+            ((HttpServletResponse) response).sendError(e.status(), e.getMessage());
             return;
         }
 
@@ -92,7 +94,7 @@ public class SecurityConfiguration {
             chain.doFilter(request, response);
         } else if (tokenValidationControllerOutputResponseEntity.getStatusCode() == HttpStatus.FORBIDDEN) {
             ((HttpServletResponse) response).sendError(HttpStatus.FORBIDDEN.value(), "Expired token");
-        } else if (tokenValidationControllerOutputResponseEntity.getStatusCode() == HttpStatus.BAD_REQUEST) {
+        } else {
             ((HttpServletResponse) response).sendError(HttpStatus.BAD_REQUEST.value(), "Request Failed");
         }
 
