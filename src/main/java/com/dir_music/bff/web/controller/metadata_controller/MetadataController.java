@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController("MetadataController")
-@RequestMapping("/metadatagad")
+@RequestMapping("/metadata")
 public class MetadataController {
     final MetadataControllerFeign metadataControllerFeign;
 
