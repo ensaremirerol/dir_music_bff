@@ -9,7 +9,6 @@ import com.dir_music.bff.feign_controller.playlist_controller.output.PlaylistCon
 import com.dir_music.bff.feign_controller.playlist_controller.output.PlaylistControllerFeignPlaylistOutput;
 import com.dir_music.bff.web.controller.playlist_controller.input.PlaylistControllerCreateInput;
 import com.dir_music.bff.web.controller.playlist_controller.input.PlaylistControllerUpdateInput;
-import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -102,6 +101,15 @@ public class PlaylistController {
         return playlistControllerFeign.getPlaylistsByUserId(userId, playlistControllerFeignRequesterUserIdInput);
     }
 
+    @PostMapping(path = "/user/me", consumes = "application/json", produces = "application/json")
+    ResponseEntity<PlaylistControllerFeignListOutput> getPlaylistsOfCurrentUser() {
+        final long requesterUserId = (long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final PlaylistControllerFeignRequesterUserIdInput playlistControllerFeignRequesterUserIdInput = PlaylistControllerFeignRequesterUserIdInput.builder()
+                .requesterUserId(requesterUserId)
+                .build();
+        return playlistControllerFeign.getPlaylistsByUserId(requesterUserId, playlistControllerFeignRequesterUserIdInput);
+    }
+
     @PostMapping(path = "playlists/search/{query}", consumes = "application/json", produces = "application/json")
     ResponseEntity<PlaylistControllerFeignListOutput> searchPlaylists(@PathVariable String query) {
         final long requesterUserId = (long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -111,8 +119,4 @@ public class PlaylistController {
         return playlistControllerFeign.searchPlaylists(query, playlistControllerFeignRequesterUserIdInput);
     }
 
-    @ExceptionHandler(FeignException.class)
-    ResponseEntity<?> handleFeignException(FeignException e) {
-        return ResponseEntity.status(e.status()).body(e.contentUTF8());
-    }
 }
