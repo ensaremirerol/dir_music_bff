@@ -1,12 +1,13 @@
 package com.dir_music.bff.feign_controller.music_metadata_controller;
 
 
-
 import com.dir_music.bff.feign_controller.music_metadata_controller.model.MetadataServiceMetadataListOutput;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @FeignClient("dir-metadata-service")
 public interface MetadataControllerFeign {
@@ -26,5 +27,10 @@ public interface MetadataControllerFeign {
             @RequestParam("genre") String genre,
             @RequestParam("year") String year,
             @RequestParam("duration") String duration
+    );
+
+    @PostMapping(path = "/get", consumes = "application/json", produces = "application/json")
+    ResponseEntity<MetadataServiceMetadataListOutput> getMusic(
+            @RequestBody List<Long> ids
     );
 }

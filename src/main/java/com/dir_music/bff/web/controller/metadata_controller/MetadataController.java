@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController("MetadataController")
 @RequestMapping("/")
 public class MetadataController {
@@ -35,5 +37,10 @@ public class MetadataController {
             @RequestParam("duration") String duration
     ) {
         return metadataControllerFeign.createMusic(file, title, artist, album, genre, year, duration);
+    }
+
+    @PostMapping(path = "/get", consumes = "application/json", produces = "application/json")
+    ResponseEntity<MetadataServiceMetadataListOutput> getMusic(@RequestBody List<Long> ids) {
+        return metadataControllerFeign.getMusic(ids);
     }
 }
