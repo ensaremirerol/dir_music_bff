@@ -37,7 +37,7 @@ public class PlaylistController {
         return playlistControllerFeign.createPlaylist(playlistControllerFeignCreateInput);
     }
 
-    @DeleteMapping(path = "/playlists/{playlistId}/delete", consumes = "application/json", produces = "application/json")
+    @DeleteMapping(path = "/{playlistId}/delete", consumes = "application/json", produces = "application/json")
     ResponseEntity<?> deletePlaylist(@PathVariable String playlistId) {
         final long requesterUserId = (long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         final PlaylistControllerFeignRequesterUserIdInput playlistControllerFeignRequesterUserIdInput = PlaylistControllerFeignRequesterUserIdInput.builder()
