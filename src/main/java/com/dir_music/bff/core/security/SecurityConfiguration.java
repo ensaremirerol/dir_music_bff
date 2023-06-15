@@ -61,7 +61,7 @@ public class SecurityConfiguration {
         if (accessToken == null || accessToken.isEmpty()) {
             Authentication auth = new CustomAuthentication(
                     null,
-                    null,
+                    "UNAUTHORIZED",
                     false
             );
             SecurityContextHolder.getContext().setAuthentication(auth);
