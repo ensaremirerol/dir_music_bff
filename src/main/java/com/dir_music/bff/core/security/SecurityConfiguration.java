@@ -50,6 +50,8 @@ public class SecurityConfiguration {
                 .requestMatchers("/search").authenticated()
                 .requestMatchers("/songs/create").hasRole("ADMIN")
                 .requestMatchers("/songs/delete").hasRole("ADMIN")
+                .requestMatchers("/musicArt/upload").hasRole("ADMIN")
+                .requestMatchers("/musicArt/delete").hasRole("ADMIN")
                 .requestMatchers("/songs/isAvailable").permitAll()
                 .anyRequest().authenticated();
         return http.build();
