@@ -27,12 +27,14 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
 import java.util.Arrays;
 
 @Configuration
+@EnableWebMvc
 public class SecurityConfiguration {
 
     final AuthenticationControllerFeign authenticationController;
@@ -49,11 +51,12 @@ public class SecurityConfiguration {
             public void addCorsMappings(CorsRegistry registry) {
                 WebMvcConfigurer.super.addCorsMappings(registry);
                 registry.addMapping("/**")
-                        .allowedOrigins("https://dirmusic.berkanttelli.work")
-                        .allowedMethods("GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD")
+                        .allowedOrigins("*")
+                        .allowedMethods("*")
                         .maxAge(14400)
-                        .allowedHeaders("Requestor-Type")
-                        .exposedHeaders("X-Get-Header");
+                        .allowedHeaders("*")
+                        .exposedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }
@@ -61,8 +64,9 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
+        http.cors();
         http.csrf().disable();
-        http.cors(AbstractHttpConfigurer::disable);
+
 
         http.addFilterBefore(this::jwtFilterChain, UsernamePasswordAuthenticationFilter.class);
         http.authorizeHttpRequests()
