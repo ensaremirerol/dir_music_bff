@@ -24,6 +24,7 @@ public class AuthenticationController {
     }
 
 
+    @CrossOrigin
     @PostMapping(path = "/register", consumes = "application/json", produces = "application/json")
     ResponseEntity<RegisterOutput> register(
             @RequestBody AuthControllerRegisterInput authControllerRegisterInput
@@ -31,6 +32,7 @@ public class AuthenticationController {
         return authenticationControllerFeign.register(authControllerRegisterInput);
     }
 
+    @CrossOrigin
     @PostMapping(path = "/login", consumes = "application/json", produces = "application/json")
     ResponseEntity<AuthControllerPasswordLoginOutput> login(
             @RequestBody AuthControllerPasswordLoginInput authInput
@@ -38,6 +40,7 @@ public class AuthenticationController {
         return authenticationControllerFeign.login(authInput);
     }
 
+    @CrossOrigin
     @GetMapping(path = "/refresh", produces = "application/json")
     ResponseEntity<AuthControllerAccessTokenOutput> refreshToken(
             @RequestParam(name = "refreshToken") String refreshToken
@@ -45,6 +48,7 @@ public class AuthenticationController {
         return authenticationControllerFeign.refreshToken(refreshToken);
     }
 
+    @CrossOrigin
     @PostMapping(path = "/change-password", consumes = "application/json", produces = "application/json")
     ResponseEntity<Void> changePassword(
             @RequestBody AuthControllerChangePasswordInput authControllerChangePasswordInput
@@ -52,6 +56,7 @@ public class AuthenticationController {
         return authenticationControllerFeign.changePassword(authControllerChangePasswordInput);
     }
 
+    @CrossOrigin
     @PostMapping(path = "/token-validation/get-claims", consumes = "application/json", produces = "application/json")
     ResponseEntity<TokenValidationControllerOutput> getClaims(
             @RequestBody TokenValidationControllerInput tokenValidationControllerInput
