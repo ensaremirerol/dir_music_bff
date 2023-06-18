@@ -44,25 +44,6 @@ public class SecurityConfiguration {
         this.authenticationController = authenticationController;
     }
 
-    @Bean
-    public WebMvcConfigurer corsMappingConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                WebMvcConfigurer.super.addCorsMappings(registry);
-                registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods("*")
-                        .maxAge(3600)
-                        .allowedHeaders("*")
-                        .exposedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
-    }
-
-
-
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

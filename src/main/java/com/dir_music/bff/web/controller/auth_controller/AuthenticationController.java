@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController("AuthenticationController")
 @RequestMapping("/")
-@CrossOrigin(origins = "*")
 public class AuthenticationController {
 
     final AuthenticationControllerFeign authenticationControllerFeign;
