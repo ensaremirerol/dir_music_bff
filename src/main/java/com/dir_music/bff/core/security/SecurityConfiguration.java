@@ -48,7 +48,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.cors();
+        http.cors().disable();
         http.csrf().disable();
 
         http.addFilterBefore(this::jwtFilterChain, UsernamePasswordAuthenticationFilter.class);
