@@ -53,7 +53,7 @@ public class SecurityConfiguration {
                 registry.addMapping("/**")
                         .allowedOrigins("*")
                         .allowedMethods("*")
-                        .maxAge(14400)
+                        .maxAge(3600)
                         .allowedHeaders("*")
                         .exposedHeaders("*")
                         .allowCredentials(true);
@@ -67,6 +67,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
+        http.cors();
         http.csrf().disable();
 
         http.addFilterBefore(this::jwtFilterChain, UsernamePasswordAuthenticationFilter.class);
